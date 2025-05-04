@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Job Recommendation System</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="script.js"></script> <!-- We will compile script.ts into script.js -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #uploadButton {
+      margin-left: 10px;
+    }
+    #jobList li {
+      margin-bottom: 8px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Job Recommendation System</h1>
+  <h1>Job Recommendation System</h1>
 
-    <input type="file" id="resumeInput" />
-    <button id="uploadButton">Upload Resume</button>
+  <input type="file" id="resumeInput" />
+  <button id="uploadButton">Upload Resume</button>
 
-    <h2>Recommended Jobs:</h2>
-    <ul id="jobList"></ul>
-  </div>
+  <h2>Recommended Jobs:</h2>
+  <ul id="jobList"></ul>
+
+  <script src="script.js"></script>
 </body>
 </html>
