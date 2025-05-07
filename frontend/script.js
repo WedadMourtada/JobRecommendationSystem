@@ -34,49 +34,123 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-function uploadResume() {
-    return __awaiter(this, void 0, void 0, function () {
-        var input, file, formData, response, jobs, jobList_1, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    input = document.getElementById('resumeInput');
-                    if (!input.files || input.files.length === 0) {
-                        alert('Please select a resume file!');
-                        return [2 /*return*/];
-                    }
-                    file = input.files[0];
-                    formData = new FormData();
-                    formData.append('file', file);
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 4, , 5]);
-                    return [4 /*yield*/, fetch('http://localhost:8001/upload_resume', {
-                            method: 'POST',
-                            body: formData,
-                        })];
-                case 2:
-                    response = _a.sent();
-                    return [4 /*yield*/, response.json()];
-                case 3:
-                    jobs = _a.sent();
-                    jobList_1 = document.getElementById('jobList');
-                    jobList_1.innerHTML = '';
-                    jobs.forEach(function (job) {
-                        var li = document.createElement('li');
-                        li.innerHTML = "<strong>".concat(job.title, "</strong> (").concat(job.location, ") - Match: ").concat(job.similarity, "%");
-                        jobList_1.appendChild(li);
-                    });
-                    return [3 /*break*/, 5];
-                case 4:
-                    error_1 = _a.sent();
-                    console.error('Error uploading resume:', error_1);
-                    alert('Failed to upload resume.');
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
-            }
-        });
+
+// Helper to select elements
+function $(id) {
+  return document.getElementById(id);
+}
+
+const resumeInput = $("resumeInput");
+const uploadArea = $("uploadArea");
+const fileNameDiv = $("fileName");
+const loadingMessage = $("loadingMessage");
+const errorMessage = $("errorMessage");
+const jobList = $("jobList");
+
+// Drag & Drop functionality
+uploadArea.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  uploadArea.classList.add("dragover");
+});
+uploadArea.addEventListener("dragleave", (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove("dragover");
+});
+uploadArea.addEventListener("drop", (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove("dragover");
+  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    resumeInput.files = e.dataTransfer.files;
+    showFileName();
+    handleUpload();
+  }
+});
+
+// Clicking the upload area triggers file dialog
+uploadArea.addEventListener("click", () => {
+  resumeInput.click();
+});
+
+// Show selected file name
+resumeInput.addEventListener("change", function () {
+  showFileName();
+  if (resumeInput.files && resumeInput.files.length > 0) {
+    handleUpload();
+  }
+});
+
+function showFileName() {
+  if (resumeInput.files && resumeInput.files.length > 0) {
+    fileNameDiv.textContent = resumeInput.files[0].name;
+  } else {
+    fileNameDiv.textContent = "";
+  }
+}
+
+function handleUpload() {
+  errorMessage.style.display = "none";
+  jobList.innerHTML = "";
+
+  if (!resumeInput.files || resumeInput.files.length === 0) {
+    errorMessage.textContent = "Please select a resume file!";
+    errorMessage.style.display = "block";
+    return;
+  }
+
+  const file = resumeInput.files[0];
+  const formData = new FormData();
+  formData.append("file", file);
+
+  loadingMessage.innerHTML = '<span class="spinner"></span> Analyzing your resume...';
+  loadingMessage.style.display = "block";
+
+  fetch("http://localhost:8000/upload_resume", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Upload failed");
+      return response.json();
+    })
+    .then((jobs) => {
+      renderJobs(jobs);
+    })
+    .catch((err) => {
+      errorMessage.textContent = "Failed to upload resume. Please try again.";
+      errorMessage.style.display = "block";
+    })
+    .finally(() => {
+      loadingMessage.style.display = "none";
     });
 }
-var uploadButton = document.getElementById('uploadButton');
-uploadButton.addEventListener('click', uploadResume);
+
+function renderJobs(jobs) {
+  jobList.innerHTML = "";
+  if (!jobs || jobs.length === 0) {
+    jobList.innerHTML = '<li>No jobs found.</li>';
+    return;
+  }
+  jobs.forEach((job) => {
+    const li = document.createElement("li");
+    li.className = "job-card";
+    // Choose an icon based on job title (simple example)
+    let icon = "&#128188;"; // briefcase
+    if (job.title.toLowerCase().includes("engineer")) icon = "&#128187;"; // laptop
+    if (job.title.toLowerCase().includes("analyst")) icon = "&#128200;"; // chart
+    if (job.title.toLowerCase().includes("manager")) icon = "&#128221;"; // clipboard
+    // Color code match
+    let matchClass = "";
+    if (job.similarity >= 90) matchClass = "";
+    else if (job.similarity >= 75) matchClass = "low";
+    else matchClass = "very-low";
+    li.innerHTML = `
+      <span class="job-icon">${icon}</span>
+      <div class="job-details">
+        <div class="job-title">${job.title}</div>
+        <div class="job-location">${job.location}</div>
+        <div class="job-match ${matchClass}">Match: ${job.similarity}%</div>
+      </div>
+    `;
+    jobList.appendChild(li);
+  });
+}

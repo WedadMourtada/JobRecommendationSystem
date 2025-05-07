@@ -2,19 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Job Recommendation System</title>
   <link rel="stylesheet" href="style.css">
-  <script defer src="script.js"></script> <!-- We will compile script.ts into script.js -->
+  <script defer src="script.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Job Recommendation System</h1>
-
-    <input type="file" id="resumeInput" />
-    <button id="uploadButton">Upload Resume</button>
-
-    <h2>Recommended Jobs:</h2>
-    <ul id="jobList"></ul>
+  <div class="main-bg">
+    <header class="site-header">
+      <div class="logo-area">
+        <span class="logo-icon">&#128188;</span>
+        <span class="logo-text">JobMatch Pro</span>
+      </div>
+    </header>
+    <div class="center-card">
+      <h1 class="main-title">Find Your Next Opportunity</h1>
+      <div class="subtitle">Upload your resume to get personalized job recommendations</div>
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">
+          <svg width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 34V14M24 14l-7 7m7-7l7 7" stroke="#14b8a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="34" width="40" height="6" rx="3" fill="#14b8a6" fill-opacity=".1"/></svg>
+        </div>
+        <div class="upload-text">Drag & Drop your resume here</div>
+        <div class="or-text">or</div>
+        <label class="browse-btn">
+          <input type="file" id="resumeInput" accept=".pdf,.doc,.docx,.txt" hidden />
+          BROWSE FILES
+        </label>
+        <div id="fileName" class="file-name"></div>
+      </div>
+      <div class="supported-formats">
+        <span>Supported Formats:</span>
+        <span class="format-icon pdf">&#128462; PDF</span>
+        <span class="format-icon doc">&#128196; DOC</span>
+        <span class="format-icon docx">&#128196; DOCX</span>
+        <span class="format-icon txt">&#128441; TXT</span>
+      </div>
+      <div id="loadingMessage" class="loading" style="display: none;">Analyzing your resume...</div>
+      <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </div>
+    <div class="results-card">
+      <h2>Recommended Jobs</h2>
+      <ul id="jobList"></ul>
+    </div>
+    <footer class="site-footer">
+      &copy; 2024 JobMatch Pro &mdash; <a href="mailto:contact@jobmatchpro.com">Contact Us</a>
+    </footer>
   </div>
 </body>
 </html>
